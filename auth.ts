@@ -7,6 +7,12 @@ import { db } from "./lib/db"
 const prisma = new PrismaClient()
  
 export const { auth, handlers, signIn, signOut } = NextAuth({
+  callbacks:{
+    async jwt({token}) {
+      console.log({token})
+      return token;
+    }
+  },
   adapter: PrismaAdapter(db),
   session: { strategy: "jwt" },
   ...authConfig,
