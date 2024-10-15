@@ -6,6 +6,7 @@ import authConfig from "./auth.config"
 import { db } from "./lib/db"
 import { getUserById } from "./data/user"
 import {UserRole} from "@prisma/client";
+import { use } from "react";
 
 
 
@@ -25,12 +26,16 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     }
   },
   callbacks:{
-    async signIn({user}) {
+    async signIn({user,account}) {
+      if(account?.provider!=="credentials")  return true;
+
       const existingUser = await getUserById(user.id);
-      // if(!existingUser ||!existingUser.emailVerified){
-      //   return false;
-      // }
+      if(!existingUser?.emailVerified) return false;
+      
       return true;
+
+     
+     
     },
     async session({token,session}) {
       console.log({
