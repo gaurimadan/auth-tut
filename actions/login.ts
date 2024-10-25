@@ -5,10 +5,9 @@ import { signIn } from "@/auth";
 import { DEFAULT_LOGIN_REDIRECT } from "@/route";
 import { AuthError } from "next-auth";
 import { generateVerificationToken } from "@/lib/tokens";
-import { getUserByEmail } from "@/data/user";
-import { userAgent } from "next/server";
-import { error } from "console";
-import { sendVerificationEmail } from "@/lib/mail";
+import { getUserByEmail } from "@/data/user"; 
+import { sendVerificationEmail,sendTwoFactorTokenEMail } from "@/lib/mail";
+import { generateTwoFactorToken } from "@/lib/tokens";
 
 export const login = async (values:z.infer<typeof LoginSchema>) =>{
     const validatedFields = LoginSchema.safeParse(values);
@@ -30,6 +29,16 @@ export const login = async (values:z.infer<typeof LoginSchema>) =>{
         verificationToken.token,
     );
     return {success:"Confirmation email sent!"};
+   }
+
+   if(existingUser.isTwoFactorEnabled && existingUser.email){
+    const twoFactorToken = await generateTwoFactorToken(existingUser.email)
+    await sendTwoFactorTokenEMail(
+        twoFactorToken.email,
+        twoFactorToken.token,
+    );
+
+    return {twoFactor:true};
    }
 
 

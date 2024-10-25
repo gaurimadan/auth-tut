@@ -18,6 +18,7 @@ import Link from "next/link";
 export const LoginForm = () => {
     const searchParams = useSearchParams();
     const urlError = searchParams.get("error") === "OAuthAccountNotLinked"? "Email already in use with different provider!":"";
+    const [showTwoFactor,setshowTwoFactor] = useState(false);
     const[error,setError] = useState<string|undefined>("");
     const[success,setSuccess] = useState<string|undefined>("");
     const[isPending,startTranstion] = useTransition();
@@ -35,9 +36,20 @@ export const LoginForm = () => {
         startTranstion(()=>{
             login(values)
              .then((data)=>{
-                setError(data?.error);
-                setSuccess(data?.success);
+                if(data?.error){
+                    form.reset();
+                    setError(data?.error);
+                }
+                if(data?.success){
+                    form.reset();
+                    setSuccess(data?.success);
+                }
+                if(data?.twoFactor){
+                    setshowTwoFactor(true);
+                }
+               
              })
+             .catch(()=>setError("Something went wrong"));
         });
     }
 
