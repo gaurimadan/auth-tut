@@ -64,7 +64,26 @@ export const LoginForm = () => {
             <FormProvider {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                     <div className="space-y-4">
-                        <FormField
+                        {showTwoFactor && ( <FormField
+                            control={form.control}
+                            name="code"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Two Factor Code</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            {...field}
+                                            disabled={isPending}
+                                            placeholder="123456"
+                                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )} />)}
+                    {!showTwoFactor &&(
+                    
+                        <>
+                             <FormField
                             control={form.control}
                             name="email"
                             render={({ field }) => (
@@ -105,6 +124,8 @@ export const LoginForm = () => {
                                     <FormMessage />
                                 </FormItem>
                             )} />
+                            </>
+                       ) }
                     </div>
                     <FormError message={error||urlError}/>
                     <FormSuccess message={success}/>
@@ -112,7 +133,7 @@ export const LoginForm = () => {
                     disabled={isPending}
                     type="submit"
                     className="w-full">
-                        Login
+                        {showTwoFactor?"Confirm":"Login"}
                     </Button>
                 </form>
             </FormProvider>
